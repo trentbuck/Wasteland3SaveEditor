@@ -1,10 +1,8 @@
 #!/usr/bin/python3
 import argparse
 import re
-import tempfile
 import ctypes
 import pathlib
-import pprint
 import subprocess
 
 
@@ -33,6 +31,7 @@ seriously, who wants to program on Windows?
 # We could use head -11 or something, but at that point it's easier to do it directly in Python, I guess...
 lzf = ctypes.cdll.LoadLibrary('liblzf.so.1')
 
+
 class Game:
     def __init__(self, path: pathlib.Path):
         self.original_path = path
@@ -51,7 +50,7 @@ class Game:
             input_bytes = f.read()
             output_bytes = ctypes.create_string_buffer(self.DataSize)
             n = lzf.lzf_decompress(input_bytes, self.SaveDataSize,
-                                    output_bytes, self.DataSize)
+                                   output_bytes, self.DataSize)
             if n != self.DataSize:
                 print(f'n is {n}')
                 print(f'self.DataSize is {self.DataSize}')
@@ -68,7 +67,7 @@ class Game:
                 # pretty-print the XML
                 subprocess.run(['xmlstarlet', 'format'], input=self.xml_bytes, stdout=f)
             else:
-                f.write(xml)
+                f.write(self.xml_bytes)
         subprocess.check_call(['sensible-editor', tmp_path])
         with tmp_path.open('rb') as f:
             self.xml_bytes = f.read()
